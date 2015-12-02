@@ -16,11 +16,12 @@ DEBIAN_VERSION: $DEBIAN_VERSION
 EOF
 
 for ARCH in ${ARCHES}; do
-  cat Dockerfile.template | \
-    sed "s,@ARCH@,${ARCH},g; s,@VERSION@,${VERSION},g; s,@DEBIAN_VERSION@,${DEBIAN_VERSION},g;" > Dockerfile
   echo "#### Building $ARCH ####"
-  cat Dockerfile
+  eval "echo \"$(cat Dockerfile)\""
 
-  docker build -t vicamo/qemu-user-static:$ARCH . \
+  docker build --build-arg ARCH=$ARCH \
+    --build-arg VERSION=$VERSION \
+    --build-arg DEBIAN_VERSION=$DEBIAN_VERSION \
+    -t vicamo/qemu-user-static:$ARCH . \
   && docker tag vicamo/qemu-user-static:$ARCH vicamo/qemu-user-static:$ARCH-$VERSION
 done
