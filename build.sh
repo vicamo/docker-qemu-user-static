@@ -1,6 +1,6 @@
 #!/bin/sh
 
-set -e
+set -xe
 
 cp /usr/bin/qemu-*-static .
 
