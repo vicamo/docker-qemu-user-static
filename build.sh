@@ -1,6 +1,9 @@
-#!/bin/sh
+#!/bin/bash
 
 set -xe
+
+DOCKER_USER=${DOCKER_USER:-vicamo}
+DOCKER_REPO=${DOCKER_REPO:-qemu-user-static}
 
 cp /usr/bin/qemu-*-static .
 
@@ -17,7 +20,7 @@ EOF
 
 new_version_available=
 for arch in ${arches}; do
-  if ! docker pull vicamo/qemu-user-static:${arch}-${version}; then
+  if ! docker pull ${DOCKER_USER}/${DOCKER_REPO}:${arch}-${version}; then
     new_version_available=yes
     break
   fi
@@ -31,6 +34,6 @@ for arch in ${arches}; do
   echo "#### Building ${arch} ####"
   cat Dockerfile
 
-  docker build -t vicamo/qemu-user-static:${arch} . \
-  && docker tag vicamo/qemu-user-static:${arch} vicamo/qemu-user-static:${arch}-${version}
+  docker build -t ${DOCKER_USER}/${DOCKER_REPO}:${arch} . \
+    && docker tag ${DOCKER_USER}/${DOCKER_REPO}:${arch} ${DOCKER_USER}/${DOCKER_REPO}:${arch}-${version}
 done
