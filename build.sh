@@ -6,7 +6,7 @@ cp /usr/bin/qemu-*-static .
 
 first=$(ls -1 qemu-*-static | head -n 1)
 arches=$(ls -1 qemu-*-static | cut -d- -f2)
-version=$(${first} -version | awk '{print $3}')
+version=$(${first} -version | sed -e 's,^.* version \([0-9\.]\+\).*$,\1,')
 debian_version=$(dpkg-query -W -f '${Version}' qemu-user-static)
 
 echo <<EOF
