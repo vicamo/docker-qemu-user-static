@@ -15,6 +15,16 @@ VERSION: $VERSION
 DEBIAN_VERSION: $DEBIAN_VERSION
 EOF
 
+new_version_available=
+for ARCH in ${ARCHES}; do
+  if ! docker pull vicamo/qemu-user-static:${ARCH}-${VERSION}; then
+    new_version_available=yes
+    break
+  fi
+done
+
+[ -n "${new_version_available}" ] || (echo "No updates available."; exit 0)
+
 for ARCH in ${ARCHES}; do
   cat Dockerfile.template | \
     sed "s,@ARCH@,${ARCH},g; s,@VERSION@,${VERSION},g; s,@DEBIAN_VERSION@,${DEBIAN_VERSION},g;" > Dockerfile
