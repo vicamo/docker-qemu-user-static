@@ -5,12 +5,17 @@ set -xe
 DOCKER_USER=${DOCKER_USER:-vicamo}
 DOCKER_REPO=${DOCKER_REPO:-qemu-user-static}
 
-cp /usr/bin/qemu-*-static .
+if (($# >= 1)); then
+  debian_version=$1
+  shift;
+else
+  cp /usr/bin/qemu-*-static .
+  debian_version=$(dpkg-query -W -f '${Version}' qemu-user-static)
+fi
 
 first=$(ls -1 qemu-*-static | head -n 1)
 arches=$(ls -1 qemu-*-static | cut -d- -f2)
-version=$(${first} -version | grep ' version ' | sed -e 's,^.* version \([0-9\.]\+\).*$,\1,')
-debian_version=$(dpkg-query -W -f '${Version}' qemu-user-static)
+version=$(./${first} -version | grep ' version ' | sed -e 's,^.* version \([0-9\.]\+\).*$,\1,')
 
 echo <<EOF
 ARCHITECTURES: ${arches}

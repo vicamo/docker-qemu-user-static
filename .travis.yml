@@ -18,15 +18,15 @@ before_install:
 - |
   sudo docker run --detach --interactive --tty --privileged \
     --name ${CONTAINER_NAME} \
-    --volume /var/run/docker.sock:/var/run/docker.sock \
     --volume "${TRAVIS_BUILD_DIR}:${TRAVIS_BUILD_DIR}" \
     --workdir "${TRAVIS_BUILD_DIR}" \
     debian:sid /bin/bash
 - ${CONTAINER_EXEC} apt update -qq
-- ${CONTAINER_EXEC} apt install --no-install-recommends -y docker.io qemu-user-static
+- ${CONTAINER_EXEC} apt install --no-install-recommends -y qemu-user-static
 
 script:
-- ${CONTAINER_EXEC} env DOCKER_USER=${DOCKER_USER} DOCKER_REPO=${DOCKER_REPO} "${TRAVIS_BUILD_DIR}/build.sh"
+- ${CONTAINER_EXEC} /bin/sh -c 'cp /usr/bin/qemu-*-static .'
+- ./build.sh $(${CONTAINER_EXEC} dpkg-query -W -f '\${Version}' qemu-user-static)
 - docker images | grep ^${DOCKER_USER}/${DOCKER_REPO} | awk '{print $1 ":" $2}'
 
 after_success:
